@@ -93,11 +93,28 @@ exibir_top5("PageRank (Importância Global)", nx.pagerank(G))
 exibir_top5("Eigenvector Centrality (Influência da Vizinhança)", nx.eigenvector_centrality(G_undirected, max_iter=1000))
 
 # Redes Clássicas para Comparação
-n = G.number_of_nodes();
-m = G.number_of_edges();
-G_random = nx.gnm_random_graph(n=n, m=m, directed=True)
-G_small_world = nx.watts_strogatz_graph(n=n, k=13, p=0.1)
-G_scale_free = nx.barabasi_albert_graph(n=n, m=m)
+nos = G.number_of_nodes();
+arestas = G.number_of_edges();
+
+# Rede Aleatória (Erdős-Rényi)
+# Podemos passar o número de nós e arestas diretamente
+G_random = nx.gnm_random_graph(n=nos, m=arestas)
+
+
+# Rede Pequeno Mundo (Watts-Strogatz)
+# O parâmetro 'k' representa os vizinhos iniciais (grau médio).
+# Grau médio (não direcionado) = (2 * arestas) / nos
+k_medio = round((2 * arestas) / nos) 
+k_medio = max(2, k_medio) #k é no máximo igual a 2
+G_small_world = nx.watts_strogatz_graph(n=nos, k=k_medio, p=0.1)
+
+
+# 3. Scale-Free (Barabási-Albert)
+# O parâmetro 'm' é o número de arestas que cada novo nó cria.
+# m equivale a aproximadamente metade do grau médio (arestas / nos).
+m_ba = round(arestas / nos)
+m_ba = max(1, min(m_ba, nos - 1))
+G_scale_free = nx.barabasi_albert_graph(n=nos, m=m_ba)
 
 print(f"--- Random ---")
 print(f"Densidade: {nx.density(G_random):.4f}")
@@ -150,8 +167,6 @@ df_vra_join = df_vra_join.merge(
 
 df_vra_join['UF Origem'] = df_vra_join['CIAD Origem'].str[:2]
 df_vra_join['UF Destino'] = df_vra_join['CIAD Destino'].str[:2]
-
-print("Base pronta para gerar os mapas!")
 
 
 # 1. GRÁFICO DE BARRAS: Top 15 Aeroportos em Quantidade de Voos (para comparação com aeroportos mais centrais)
