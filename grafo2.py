@@ -281,7 +281,7 @@ ax.set_title('Top 15 aeroportos por movimentação')
 fig.tight_layout()
 plt.show()
 
-# 2. MAPA 1: GEOPANDAS (Rede de Voos)
+# REDE DE VOOS
 df_mapa = df_vra_join.dropna(subset=['ICAO Aeródromo Origem', 'ICAO Aeródromo Destino', 'Latitude Origem', 'Longitude Origem', 'Latitude Destino', 'Longitude Destino']).copy()
 arestas_mapa = df_mapa.groupby(['ICAO Aeródromo Origem', 'ICAO Aeródromo Destino']).size().reset_index(name='peso')
 
@@ -300,18 +300,3 @@ nx.draw_networkx_nodes(G_vis, posicoes, ax=ax, node_size=15)
 ax.set_title('Rede de voos domésticos — Julho/2026')
 ax.set_axis_off()
 plt.show()
-
-
-# 3. MAPA 2: PLOTLY EXPRESS (Interativo)
-origem = df_vra_join.groupby(['ICAO Aeródromo Origem', 'Nome Origem', 'UF Origem', 'Latitude Origem', 'Longitude Origem']).size().reset_index(name='Voos').rename(columns={'ICAO Aeródromo Origem': 'ICAO', 'Nome Origem': 'Aeroporto', 'UF Origem': 'UF', 'Latitude Origem': 'Latitude', 'Longitude Origem': 'Longitude'})
-destino = df_vra_join.groupby(['ICAO Aeródromo Destino', 'Nome Destino', 'UF Destino', 'Latitude Destino', 'Longitude Destino']).size().reset_index(name='Voos').rename(columns={'ICAO Aeródromo Destino': 'ICAO', 'Nome Destino': 'Aeroporto', 'UF Destino': 'UF', 'Latitude Destino': 'Latitude', 'Longitude Destino': 'Longitude'})
-
-aero_mov = pd.concat([origem, destino]).groupby(['ICAO', 'Aeroporto', 'UF', 'Latitude', 'Longitude'], as_index=False)['Voos'].sum()
-
-fig = px.scatter_map(
-    aero_mov, lat='Latitude', lon='Longitude', size='Voos', color='Voos',
-    hover_name='Aeroporto', hover_data={'ICAO': True, 'UF': True, 'Voos': True, 'Latitude': False, 'Longitude': False},
-    zoom=3.3, center={'lat': -14.2, 'lon': -51.9}, size_max=35, map_style='open-street-map',
-    title='Movimentação dos aeroportos — Julho/2026'
-)
-fig.show()
