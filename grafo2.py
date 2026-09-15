@@ -175,33 +175,38 @@ print(f"Aleatória   - Clustering: {clust_rand:.4f} | Path Length: {path_rand:.4
 print(f"Small-World - Clustering: {clust_sw:.4f} | Path Length: {path_sw:.4f}")
 print(f"Scale-Free  - Clustering: {clust_sf:.4f} | Path Length: {path_sf:.4f}")
 
-# GRÁFICO DE DISTRIBUIÇÃO DE GRAU
-plt.figure(figsize=(10, 6))
+# GRÁFICOS DE DISTRIBUIÇÃO DE GRAU SEPARADOS
 
-def plot_ccdf(graus, label):
+def plot_ccdf_separado(graus, titulo, cor, nome_arquivo):
+    plt.figure(figsize=(5, 5))
+    
     # Conta a frequência de cada grau
     contagem = collections.Counter(graus)
     graus_unicos = sorted(contagem.keys())
     
-    # Calcula P(X >= k) apenas para os graus únicos
+    # Calcula P(X >= k)
     total_nos = len(graus)
     ccdf = [sum(v for k, v in contagem.items() if k >= grau) / total_nos for grau in graus_unicos]
     
-    plt.plot(graus_unicos, ccdf, marker='o', linestyle='-', label=label, alpha=0.7)
+    # Plota o gráfico isolado
+    plt.plot(graus_unicos, ccdf, marker='o', linestyle='-', color=cor, alpha=0.8)
+    plt.title(titulo, fontsize=12)
+    plt.xlabel("Grau (k)")
+    plt.ylabel("P(X >= k)")
+    plt.xscale("log")
+    plt.yscale("log")
+    plt.grid(True, linestyle="--", alpha=0.6)
+    plt.tight_layout()
+    
+    # Salva a imagem
+    plt.savefig(nome_arquivo, dpi=300, transparent=True)
+    plt.show()
 
-plot_ccdf(graus_orig, "Original")
-plot_ccdf(graus_rand, "Aleatória")
-plot_ccdf(graus_sw, "Small-World")
-plot_ccdf(graus_sf, "Scale-Free")
-
-plt.title("Distribuição de Grau Cumulativa (CCDF)")
-plt.xlabel("Grau (k)")
-plt.ylabel("P(X >= k)")
-plt.xscale("log")
-plt.yscale("log")
-plt.legend()
-plt.grid(True, linestyle="--", alpha=0.6)
-plt.show()
+# Gera as imagens separadas para o slide
+plot_ccdf_separado(graus_orig, "Rede de Aeroportos", "#1A3B5C", "ccdf_aeroportos.png")
+plot_ccdf_separado(graus_rand, "Rede Aleatória", "#E67E22", "ccdf_aleatoria.png")
+plot_ccdf_separado(graus_sw, "Rede de Pequeno Mundo", "#27AE60", "ccdf_pequeno_mundo.png")
+plot_ccdf_separado(graus_sf, "Rede Livre de Escala", "#8E44AD", "ccdf_livre_escala.png")
 
 
 # MAPAS
